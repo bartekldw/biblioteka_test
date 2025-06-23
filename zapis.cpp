@@ -277,13 +277,6 @@ struct Book { //struct to hold the book data
     std::string author;
     int year;
 };
-
-struct LibraryData {
-    std::string name;
-    std::string colour;
-    std::string style;
-};
-
 class Library { //class that manages book data
 public:
     std::string file;
@@ -365,8 +358,6 @@ private:
     }
 public:
     std::string file_name;
-
-
     bool save_library(const std::string& name, const std::string colour, const std::string style) {
         std::ofstream file_save(file_name, std::ios::out | std::ios::app);
         if (file_save.is_open()) {
@@ -376,7 +367,7 @@ public:
         }
         return false;
     }
-    bool create_library(std::vector<LibraryData>& lib_dat) {
+    bool create_library(std::vector<Library>& lib_dat) {
         if (console::file_exists(file_name)) {
             std::ifstream file_load("library.txt",std::ios::in);
             if (file_load.is_open()) {
@@ -385,10 +376,11 @@ public:
                 std::string name, colour, style;
                 while (std::getline(file_load, line)) {
                     export_library_data(line, name, colour, style);
-                    LibraryData librarycur;
+                    Library librarycur;
                     librarycur.name = name;
                     librarycur.colour = colour;
                     librarycur.style = style;
+                    librarycur.file = "library.txt";
                     lib_dat.push_back(librarycur);
                     LogWriter::write_log("Succesfully added library ",name,"to object vector");
                     name = ""; colour = ""; style = "";
@@ -590,7 +582,7 @@ public:
         }
     }
 
-    void static manage_libraries(int library_id_current, std::vector<Library>& libraries, std::vector<LibraryData>& libraries_data) {
+    void static manage_libraries(int library_id_current, std::vector<Library>& libraries) {
         LogWriter::write_log("Displaying libraries management menu");
         int choice;
         int* type_of_warning = new int {0};
@@ -636,7 +628,7 @@ public:
                 std::cout << "\033[1;30m[\033[1;32mLibrary Managment\033[1;30m]\033[0m\n";
                 std::cout << "All libraries:" << std::endl;
                 int count = 0;
-                for (auto element : libraries_data) {
+                for (auto element : libraries) {
                     std::cout << ++count << ". ";
                     console::print_special_liblary(element.style, element.colour, element.name);
                     console::reset_colour();
@@ -747,7 +739,7 @@ public:
                     }
                 } while (true);
                 libraries[library_choice].name = new_name;
-                libraries_data[library_choice].name = new_name;
+
                 std::ofstream library_management_file("library.txt", std::ios::out | std::ios::trunc);
                 if (library_management_file.is_open()) {
                     for (auto element : libraries) {
@@ -827,7 +819,7 @@ public:
 
                 }
                 libraries[library_choice].colour = colour_string;
-                libraries_data[library_choice].colour = colour_string;
+
                 std::ofstream library_management_file("library.txt", std::ios::out | std::ios::trunc);
                 if (library_management_file.is_open()) {
                     for (auto element : libraries) {
@@ -841,7 +833,83 @@ public:
                 }
             }
             else if (action_choice == 3) {
-                std::cout << "nic";
+                int colour = 0;
+                std::string colour_string;
+                *type_of_warning = 0;
+                do{
+                    console::clear();
+                    std::cout << "\033[1;30m[\033[1;32mLibrary Managment\033[1;30m]\033[0m\n";
+                    std::cout << "1. \033[1;30m" << libraries[library_choice].name << " (black)\033[0m" << std::endl;
+                    std::cout << "2. \033[1;31m" << libraries[library_choice].name << " (red)\033[0m" << std::endl;
+                    std::cout << "3. \033[1;32m" << libraries[library_choice].name << " (green)\033[0m" << std::endl;
+                    std::cout << "4. \033[1;33m" << libraries[library_choice].name << " (yellow)\033[0m" << std::endl;
+                    std::cout << "5. \033[1;34m" << libraries[library_choice].name << " (blue)\033[0m" << std::endl;
+                    std::cout << "6. \033[1;35m" << libraries[library_choice].name << " (purple)\033[0m" << std::endl;
+                    std::cout << "7. \033[1;36m" << libraries[library_choice].name << " (cyan)\033[0m" << std::endl;
+                    std::cout << "8. \033[1;37m" << libraries[library_choice].name << " (white)\033[0m" << std::endl;
+                    if (*type_of_warning == 1) {
+                        console::log_err("Please enter a valid data!");
+                    }
+                    else if (*type_of_warning == 2) {
+                        console::log_err("Please choose a number between 1 and 8!");
+                    }
+                    std::cout << "\033[1;30m[\033[1;32m?\033[1;30m]\033[0m Which colour would you like to use: \033[1;30m";
+                    std::cin >> colour;
+
+                    if (std::cin.fail()) {
+                        std::cin.clear();
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        LogWriter::write_log_warning("User tried to enter wrong type of data");
+                        *type_of_warning = 1;
+                    }
+                    else if (colour < 1 || colour > 8) {
+                        LogWriter::write_log_warning("User tried to enter the wrong range of numbers");
+                    }
+                    else {
+                        break;
+                    }
+                } while (true);
+                delete type_of_warning;
+                switch (colour) {
+                    case 1:
+                        colour_string = "black";
+                        break;
+                    case 2:
+                        colour_string = "red";
+                        break;
+                    case 3:
+                        colour_string = "green";
+                        break;
+                    case 4:
+                        colour_string = "yellow";
+                        break;
+                    case 5:
+                        colour_string = "blue";
+                        break;
+                    case 6:
+                        colour_string = "purple";
+                        break;
+                    case 7:
+                        colour_string = "cyan";
+                        break;
+                    case 8:
+                        colour_string = "white";
+                        break;
+
+                }
+                libraries[library_choice].colour = colour_string;
+
+                std::ofstream library_management_file("library.txt", std::ios::out | std::ios::trunc);
+                if (library_management_file.is_open()) {
+                    for (auto element : libraries) {
+                        library_management_file << element.name << ";" << element.colour << ";" << element.style << "\n";
+                    }
+                    library_management_file.close();
+                }
+                else {
+                    LogWriter::write_log_err("Error while trying to load library data file. Try checking your working directory of the program");
+                    return;
+                }
             }
 
 
@@ -854,32 +922,10 @@ public:
 };
 int main() {
     LogWriter::clear_log();
-    std::vector<LibraryData> libraries_data;
     LibraryCreator create;
     create.file_name = "library.txt";
-    create.create_library(libraries_data);
     std::vector<Library> libraries;
-
-    for (auto element : libraries_data) {
-        Library cur_library;
-        cur_library.name = element.name;
-        cur_library.colour = element.colour;
-        cur_library.style = element.style;
-        cur_library.file= "books.txt";
-        libraries.push_back(cur_library);
-    }
-
-    /*for (auto element : libraries_data) {
-        std::cout << element.name << "," << element.colour << "," << element.style << std::endl;
-    }*/
-    /*std::vector<Book> books;
-    Library bartkozbior;
-    FileManagement file_management;
-    file_management.file_name = "books.txt";
-    bartkozbior.name = "Bartkobibliotekus";
-    bartkozbior.colour = "green";
-    bartkozbior.style = "ascii";
-    bartkozbior.file = "books.txt";*/
+    create.create_library(libraries);
 
     std::vector<Book> books;
     while (true) {
@@ -898,7 +944,7 @@ int main() {
         }
         else if (choice == 3) {
             LogWriter::write_log("Opening the libraries menu");
-            create.manage_libraries(0, libraries, libraries_data);
+            create.manage_libraries(0, libraries);
         }
         else if (choice == 4) {
             break;

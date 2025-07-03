@@ -1,4 +1,4 @@
-# Wirtualna biblioteka 📚
+<h1 align="center">Wirtualna biblioteka 📚</h1>
 <div align="center">
   <p>Projekt nieskończony, ale fajny</p>
 </div>
